@@ -1,0 +1,20 @@
+body {
+    font-family: Arial;
+    background: #f4f4f4;
+    text-align: center;
+}
+
+#products {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.card {
+    background: white;
+    padding: 15px;
+    width: 200px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px #ccc;
+}

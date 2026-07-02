@@ -6,11 +6,13 @@ fetch("/api/products")
     data.forEach(p => {
         container.innerHTML += `
             <div class="card">
-                <h3>${p.name}</h3>
+                <a href="/product?id=${p.id}">
+                    <h3>${p.name}</h3>
+                </a>
                 <p>${p.description}</p>
                 <h4>₹${p.price}</h4>
 
-                <button onclick="addToCart(${p.id}, '${p.name}', ${p.price})">
+                <button onclick="addToCart(${p.id}, '${p.name}')">
                     Add to Cart
                 </button>
             </div>
@@ -18,15 +20,30 @@ fetch("/api/products")
     });
 });
 
-// CART ARRAY (temporary storage)
-let cart = [];
+// backend se connected addToCart
+async function addToCart(id, name) {
+    const token = localStorage.getItem("token");
 
-function addToCart(id, name, price) {
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    if (!token) {
+        window.location.href = "/login";
+        return;
+    }
 
-    cart.push({ id, name, price });
+    const res = await fetch("/api/cart/add", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({ product_id: id, quantity: 1 })
+    });
 
-    localStorage.setItem("cart", JSON.stringify(cart));
+    const data = await res.json();
+
+    if (!res.ok) {
+        alert(data.message);
+        return;
+    }
 
     alert(name + " added to cart");
 }

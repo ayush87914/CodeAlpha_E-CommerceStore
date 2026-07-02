@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checkout</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <h1>Checkout</h1>
+    <div id="err" style="color:red"></div>
+    <form id="checkoutForm">
+        <input type="text" id="name" placeholder="Full Name" required><br>
+        <input type="text" id="address" placeholder="Address" required><br>
+        <input type="text" id="city" placeholder="City" required><br>
+        <input type="text" id="zip" placeholder="PIN Code" required><br>
+        <button type="submit">Place Order</button>
+    </form>
+
+    <script>
+    const token = localStorage.getItem("token");
+    if (!token) window.location.href = "/login";
+
+    document.getElementById("checkoutForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const res = await fetch("/api/orders", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({
+                name: document.getElementById("name").value,
+                address: document.getElementById("address").value,
+                city: document.getElementById("city").value,
+                zip: document.getElementById("zip").value
+            })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            document.getElementById("err").innerText = data.message;
+            return;
+        }
+        alert("Order placed! Order ID: " + data.orderId);
+        window.location.href = "/";
+    });
+    </script>
+</body>
+</html>

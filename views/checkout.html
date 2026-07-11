@@ -1,47 +1,56 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Checkout</title>
+    <title>Checkout — BazaarHub</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <h1>Checkout</h1>
-    <div id="err" style="color:red"></div>
-    <form id="checkoutForm">
-        <input type="text" id="name" placeholder="Full Name" required><br>
-        <input type="text" id="address" placeholder="Address" required><br>
-        <input type="text" id="city" placeholder="City" required><br>
-        <input type="text" id="zip" placeholder="PIN Code" required><br>
-        <button type="submit">Place Order</button>
-    </form>
 
-    <script>
-    const token = localStorage.getItem("token");
-    if (!token) window.location.href = "/login";
+<div class="checkout-page">
+    <div class="checkout-card">
+        <h1>🔒 Secure Checkout</h1>
+        <p>Enter your shipping details to place the order</p>
+        <div id="err" class="error" style="display:none"></div>
+        <form id="checkoutForm">
+            <input type="text" id="name" placeholder="Full Name" required>
+            <input type="text" id="address" placeholder="Address" required>
+            <input type="text" id="city" placeholder="City" required>
+            <input type="text" id="zip" placeholder="PIN Code" required>
+            <button type="submit">Place Order</button>
+        </form>
+    </div>
+</div>
 
-    document.getElementById("checkoutForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const res = await fetch("/api/orders", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + token
-            },
-            body: JSON.stringify({
-                name: document.getElementById("name").value,
-                address: document.getElementById("address").value,
-                city: document.getElementById("city").value,
-                zip: document.getElementById("zip").value
-            })
-        });
-        const data = await res.json();
-        if (!res.ok) {
-            document.getElementById("err").innerText = data.message;
-            return;
-        }
-        alert("Order placed! Order ID: " + data.orderId);
-        window.location.href = "/";
+<script>
+const token = localStorage.getItem("token");
+if (!token) window.location.href = "/login";
+
+document.getElementById("checkoutForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({
+            name: document.getElementById("name").value,
+            address: document.getElementById("address").value,
+            city: document.getElementById("city").value,
+            zip: document.getElementById("zip").value
+        })
     });
-    </script>
+    const data = await res.json();
+    const errBox = document.getElementById("err");
+
+    if (!res.ok) {
+        errBox.innerText = data.message;
+        errBox.style.display = "block";
+        return;
+    }
+    alert("Order placed! Order ID: " + data.orderId);
+    window.location.href = "/";
+});
+</script>
 </body>
 </html>

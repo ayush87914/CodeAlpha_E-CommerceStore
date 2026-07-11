@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 require("dotenv").config();
 
-// REGISTER
 exports.register = (req, res) => {
     const { name, email, password } = req.body;
 
@@ -35,7 +34,6 @@ exports.register = (req, res) => {
     });
 };
 
-// LOGIN
 exports.login = (req, res) => {
     const { email, password } = req.body;
 
@@ -60,5 +58,26 @@ exports.login = (req, res) => {
 
             res.json({ message: "Login successful", token, user: { id: user.id, name: user.name, email: user.email } });
         });
+    });
+};
+
+// NAYA — profile fetch karo
+exports.getProfile = (req, res) => {
+    User.findById(req.user.id, (err, results) => {
+        if (err) return res.status(500).json({ message: "Server error" });
+        if (results.length === 0) return res.status(404).json({ message: "User not found" });
+        res.json(results[0]);
+    });
+};
+
+// NAYA — profile update karo (naam customize)
+exports.updateProfile = (req, res) => {
+    const { name } = req.body;
+    if (!name || !name.trim()) {
+        return res.status(400).json({ message: "Name cannot be empty" });
+    }
+    User.updateName(req.user.id, name.trim(), (err) => {
+        if (err) return res.status(500).json({ message: "Server error" });
+        res.json({ message: "Profile updated", name: name.trim() });
     });
 };

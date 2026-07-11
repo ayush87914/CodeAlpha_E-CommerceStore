@@ -1,20 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>E-Commerce Store</title>
+    <title>BazaarHub</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
 <div class="top-bar">
-    <h1>🛒 My Store</h1>
-    <a href="/cart" id="cartLink" class="cart-link">
-        🛍️ Cart (<span id="cartCount">0</span>)
-    </a>
+    <h1>🛍️ BazaarHub</h1>
+    <div class="nav-right">
+        <a href="/cart" id="cartLink" class="cart-link">🛒 Cart (<span id="cartCount">0</span>)</a>
+        <div class="user-menu">
+            <button class="user-avatar" id="avatarBtn">U</button>
+            <div class="dropdown" id="dropdown">
+                <div class="dropdown-name" id="dropdownName">User</div>
+                <div class="dropdown-email" id="dropdownEmail"></div>
+                <hr>
+                <a href="/profile">👤 Profile</a>
+                <a href="#" id="logoutBtn">🚪 Logout</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="hero-banner">
+    <h2>Festive Sale is Live! 🎉</h2>
+    <p>Handpicked home & lifestyle products — up to 40% off, today only.</p>
 </div>
 
 <div id="products"></div>
 
+<script src="/js/nav.js"></script>
 <script src="/js/app.js"></script>
 
 </body>

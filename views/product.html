@@ -1,43 +1,97 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Product</title>
+    <title>Product — BazaarHub</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
+
+<div class="top-bar">
+    <h1>🛍️ BazaarHub</h1>
+    <div class="nav-right">
+        <a href="/cart" id="cartLink" class="cart-link">🛒 Cart (<span id="cartCount">0</span>)</a>
+        <div class="user-menu">
+            <button class="user-avatar" id="avatarBtn">U</button>
+            <div class="dropdown" id="dropdown">
+                <div class="dropdown-name" id="dropdownName">User</div>
+                <div class="dropdown-email" id="dropdownEmail"></div>
+                <hr>
+                <a href="/profile">👤 Profile</a>
+                <a href="#" id="logoutBtn">🚪 Logout</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="product-page">
     <div id="productBox">Loading...</div>
+</div>
 
-    <script>
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
+<script src="/js/nav.js"></script>
+<script>
+updateCartCount();
 
-    fetch("/api/products/" + id)
-        .then(res => res.json())
-        .then(p => {
-            document.getElementById("productBox").innerHTML = `
-                <img src="${p.image}" width="300"><br>
-                <h1>${p.name}</h1>
-                <p>${p.description}</p>
-                <h3>₹${p.price}</h3>
-                <button onclick="addToCart(${p.id})">Add to Cart</button>
-            `;
-        });
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+let currentQty = 1;
 
-    async function addToCart(id) {
-        const token = localStorage.getItem("token");
-        if (!token) { window.location.href = "/login"; return; }
+fetch("/api/products/" + id)
+    .then(res => res.json())
+    .then(p => {
+        const fakeRating = (4 + Math.random() * 0.9).toFixed(1);
+        document.getElementById("productBox").innerHTML = `
+            <div class="product-detail">
+                <img class="product-detail-img" src="${p.image || 'https://placehold.co/500x500?text=' + encodeURIComponent(p.name)}" alt="${p.name}">
+                <div class="product-detail-info">
+                    <h1>${p.name}</h1>
+                    <span class="rating">⭐ ${fakeRating}</span>
+                    <p class="desc">${p.description}</p>
+                    <h3>₹${p.price}</h3>
+                    <div class="qty-row">
+                        <div class="qty-box">
+                            <button onclick="changeQty(-1)">−</button>
+                            <span id="qtyDisplay">1</span>
+                            <button onclick="changeQty(1)">+</button>
+                        </div>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(${p.id})">Add to Cart</button>
+                </div>
+            </div>
+        `;
+    });
 
-        const res = await fetch("/api/cart/add", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + token
-            },
-            body: JSON.stringify({ product_id: id, quantity: 1 })
-        });
-        const data = await res.json();
-        alert(data.message);
-    }
-    </script>
+function changeQty(delta) {
+    currentQty = Math.max(1, currentQty + delta);
+    document.getElementById("qtyDisplay").innerText = currentQty;
+}
+
+async function addToCart(id) {
+    const token = localStorage.getItem("token");
+    if (!token) { window.location.href = "/login"; return; }
+
+    const res = await fetch("/api/cart/add", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({ product_id: id, quantity: currentQty })
+    });
+    const data = await res.json();
+    alert(data.message);
+    updateCartCount();
+}
+
+async function updateCartCount() {
+    const countEl = document.getElementById("cartCount");
+    const token = localStorage.getItem("token");
+    if (!countEl || !token) return;
+
+    const res = await fetch("/api/cart", { headers: { "Authorization": "Bearer " + token } });
+    if (!res.ok) return;
+    const items = await res.json();
+    countEl.innerText = items.reduce((sum, item) => sum + item.quantity, 0);
+}
+</script>
 </body>
 </html>

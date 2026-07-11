@@ -7,11 +7,14 @@ fetch("/api/products")
     let container = document.getElementById("products");
 
     data.forEach(p => {
+        const fakeRating = (4 + Math.random() * 0.9).toFixed(1);
         container.innerHTML += `
             <div class="card">
                 <a href="/product?id=${p.id}">
+                    <img src="${p.image || 'https://placehold.co/300x200?text=' + encodeURIComponent(p.name)}" alt="${p.name}">
                     <h3>${p.name}</h3>
                 </a>
+                <span class="rating">⭐ ${fakeRating}</span>
                 <p>${p.description}</p>
                 <h4>₹${p.price}</h4>
 

@@ -23,17 +23,22 @@ async function loadCart() {
     items.forEach(item => {
         total += item.price * item.quantity;
         container.innerHTML += `
-            <div>
-                <h3>${item.name}</h3>
-                <p>₹${item.price} x ${item.quantity}</p>
+            <div class="cart-item">
+                <img src="${item.image || 'https://placehold.co/100x100?text=' + encodeURIComponent(item.name)}" alt="${item.name}">
+                <div class="cart-item-info">
+                    <h3>${item.name}</h3>
+                    <p>₹${item.price} x ${item.quantity}</p>
+                </div>
                 <button onclick="removeItem(${item.id})">Remove</button>
             </div>
         `;
     });
 
     container.innerHTML += `
-        <h2>Total: ₹${total}</h2>
-        <button onclick="window.location.href='/checkout'">Checkout</button>
+        <div class="cart-summary">
+            <h2>Total: ₹${total}</h2>
+            <button onclick="window.location.href='/checkout'">Proceed to Checkout</button>
+        </div>
     `;
 }
 
